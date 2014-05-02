@@ -1,0 +1,196 @@
+
+% Cal Poly Thesis
+% 
+% based on UC Thesis format
+%
+% modified by Mark Barry 2/07.
+%
+
+\documentclass[12pt]{ucthesis}
+
+\newif\ifpdf
+\ifx\pdfoutput\undefined
+    \pdffalse % we are not running PDFLaTeX
+\else
+\pdfoutput=1 % we are running PDFLaTeX
+\pdftrue \fi
+
+\usepackage{url}
+\usepackage{multicol}
+\ifpdf
+
+    \usepackage[pdftex]{graphicx}
+    % Update title and author below...
+    \usepackage[pdftex,plainpages=false,breaklinks=true,colorlinks=true,urlcolor=blue,citecolor=blue,%
+                                       linkcolor=blue,bookmarks=true,bookmarksopen=true,%
+                                       bookmarksopenlevel=3,pdfstartview=FitV,
+                                       pdfauthor={Brett Armstrong},
+                                       pdftitle={Can Clustering Improve Requirements Traceability?},
+                                       pdfkeywords={thesis, masters, cal poly}
+                                       ]{hyperref}
+    %Options with pdfstartview are FitV, FitB and FitH
+    \pdfcompresslevel=1
+
+\else
+    \usepackage{graphicx}
+\fi
+
+\usepackage[linktoc=all]{hyperref}
+\hypersetup{
+    colorlinks,
+    citecolor=black,
+    filecolor=black,
+    linkcolor=black,
+    urlcolor=black
+}
+
+\usepackage{titlesec}
+% \titleformat{\chapter}[display]% OLD
+%     {\normalfont\huge\bfseries}{\chaptertitlename\ \thechapter}{20pt}{\Huge}% OLD
+% \titlespacing*{\chapter}{0pt}{50pt}{40pt}% OLD
+\titleformat{\chapter}[display]% NEW
+    {\normalfont\centering}{\chaptertitlename\ \thechapter}{12pt}{}% NEW
+\titlespacing*{\chapter}{0pt}{30pt}{20pt}% NEW
+
+%\titleformat{\section}[block]{first}{label}{12pt}
+
+\titleformat{\section}{}{\thesection}{1em}{}
+\titleformat{\subsection}{}{\thesubsection}{1em}{}
+\titleformat{\subsubsection}{}{\thesubsubsection}{1em}{}
+\titleformat{\paragraph}{}{\theparagraph}{1em}{}
+
+\usepackage[font={}]{caption}
+
+%\renewcommand{\cftchapleader}{\cftdotfill{\cftdotsep}} % for chapters
+%\renewcommand{\cftsecleader}{\cftdotfill{\cftdotsep}} 
+
+
+\usepackage{amssymb}
+\usepackage{amsmath}
+\usepackage[letterpaper]{geometry}
+\usepackage[overload]{textcase}
+\usepackage[toc,page]{appendix}
+
+\usepackage{tabularx}
+\usepackage{algorithm}
+\usepackage{algpseudocode}
+
+\usepackage{enumitem}
+\setlist{nolistsep}
+
+
+\floatstyle{boxed}
+\restylefloat{table}
+
+\bibliographystyle{abbrv}
+
+\setlength{\parindent}{0.25in} \setlength{\parskip}{6pt}
+
+\geometry{verbose,nohead,tmargin=1.25in,bmargin=1in,lmargin=1.5in,rmargin=1.3in}
+
+\setcounter{tocdepth}{2}
+
+
+% Different font in captions (single-spaced, bold) ------------
+%\newcommand{\captionfonts}{\small\bf\ssp}
+\newcommand{\captionfonts}{}
+
+\makeatletter  % Allow the use of @ in command names
+\long\def\@makecaption#1#2{%
+  \vskip\abovecaptionskip
+  \sbox\@tempboxa{{\captionfonts #1: #2}}%
+  \ifdim \wd\@tempboxa >\hsize
+    {\captionfonts #1: #2\par}
+  \else
+    \hbox to\hsize{\hfil\box\@tempboxa\hfil}%
+  \fi
+  \vskip\belowcaptionskip}
+\makeatother   % Cancel the effect of \makeatletter
+% ---------------------------------------
+
+
+
+\begin{document}
+
+% Declarations for Front Matter
+
+% Update fields below!
+\title{Can Clustering Improve Requirements Traceability?
+       A Tracelab-enabled Study}
+\author{Brett Armstrong}
+\degreemonth{December} \degreeyear{2013} \degree{Master of Science}
+\defensemonth{December} \defenseyear{2013}
+\numberofmembers{3} \chair{Professor Alexander Dekhtyar, Ph.D.,\newline Department of Computer Science} \othermemberA{Professor David Janzen, Ph.D.,\newline Department of Computer Science} \othermemberB{Professor Foaad Khosmood, Ph.D.,\newline Department of Computer Science} \field{Computer Science} \campus{San Luis Obispo}
+\copyrightyears{seven}
+
+
+
+\maketitle
+
+\begin{frontmatter}
+
+% Custom made for Cal Poly (by Mark Barry, modified by Andrew Tsui).
+\copyrightpage
+
+% Custom made for Cal Poly (by Andrew Tsui).
+\committeemembershippage
+
+\begin{abstract}
+
+\input{Abstract}
+
+\end{abstract}
+
+\begin{acknowledgements}
+
+Thanks to:
+
+\begin{itemize}
+\item My advisor Alex Dekhtyar, who has been awesome in every regard.
+\item Jane Cleland-Huang, Piotr Pruski, and the TraceLab team for including and supporting me on their project.
+\item My girlfriend Giselle Griffin, who has encouraged me every step of the way.
+\item My parents and my family for supporting me always.
+\end{itemize}
+
+\end{acknowledgements}
+
+\tableofcontents
+
+\listoftables
+
+\listoffigures
+
+\end{frontmatter}
+
+\pagestyle{plain}
+
+\renewcommand{\baselinestretch}{1.66}
+
+
+% ------------- Main chapters here --------------------
+
+\include{Introduction}
+
+\include{Background}
+
+\include{TLComponents}
+
+\include{Clustering}
+
+\include{ExperimentalDesign}
+
+\include{ConclusionFutureWork}
+
+% ------------- End main chapters ----------------------
+
+\clearpage
+\bibliographystyle{plain}
+\bibliography{Bibliography}
+%\addcontentsline{toc}{chapter}{Bibliography}
+
+\begin{appendix}
+%\addcontentsline{toc}{chapter}{\appendixnamelower}
+\include{Appendix}
+\end{appendix}
+
+\end{document}
