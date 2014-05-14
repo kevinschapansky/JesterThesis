@@ -7,6 +7,7 @@
 %
 
 \documentclass[12pt]{ucthesis}
+\usepackage{ifpdf}
 
 \newif\ifpdf
 \ifx\pdfoutput\undefined
@@ -21,13 +22,12 @@
 
     \usepackage[pdftex]{graphicx}
     % Update title and author below...
-    \usepackage[pdftex,plainpages=false,breaklinks=true,colorlinks=true,urlcolor=blue,citecolor=blue,%
-                                       linkcolor=blue,bookmarks=true,bookmarksopen=true,%
-                                       bookmarksopenlevel=3,pdfstartview=FitV,
-                                       pdfauthor={Brett Armstrong},
-                                       pdftitle={Can Clustering Improve Requirements Traceability?},
-                                       pdfkeywords={thesis, masters, cal poly}
-                                       ]{hyperref}
+    \usepackage[pdftex,plainpages=false,breaklinks=true,colorlinks=true,urlcolor=blue,citecolor=blue,
+		linkcolor=blue,bookmarks=true,bookmarksopen=true,%
+		bookmarksopenlevel=3,pdfstartview=FitV,
+		pdfauthor={Kevin Schapansky},
+		pdftitle={Jester: A Device Abstraction and Data Fusion API for Skeletal Tracking Sensors},
+		pdfkeywords={thesis, masters, cal poly}]{hyperref}
     %Options with pdfstartview are FitV, FitB and FitH
     \pdfcompresslevel=1
 
@@ -35,13 +35,14 @@
     \usepackage{graphicx}
 \fi
 
-\usepackage[linktoc=all]{hyperref}
+\usepackage{hyperref}
 \hypersetup{
     colorlinks,
     citecolor=black,
     filecolor=black,
     linkcolor=black,
-    urlcolor=black
+    urlcolor=black,
+    linktoc=all
 }
 
 \usepackage{titlesec}
@@ -115,12 +116,13 @@
 % Declarations for Front Matter
 
 % Update fields below!
-\title{Can Clustering Improve Requirements Traceability?
-       A Tracelab-enabled Study}
-\author{Brett Armstrong}
-\degreemonth{December} \degreeyear{2013} \degree{Master of Science}
-\defensemonth{December} \defenseyear{2013}
-\numberofmembers{3} \chair{Professor Alexander Dekhtyar, Ph.D.,\newline Department of Computer Science} \othermemberA{Professor David Janzen, Ph.D.,\newline Department of Computer Science} \othermemberB{Professor Foaad Khosmood, Ph.D.,\newline Department of Computer Science} \field{Computer Science} \campus{San Luis Obispo}
+\title{Jester: 
+A Device Abstraction and Data Fusion API 
+for Skeletal Tracking Sensors}
+\author{Kevin Schapansky}
+\degreemonth{June} \degreeyear{2014} \degree{Master of Science}
+\defensemonth{June} \defenseyear{2014}
+\numberofmembers{3} \chair{Professor Zo{\"e}, Ph.D.,\newline Department of Computer Science} \othermemberA{Assistant Professor Chris Lupo, Ph.D.,\newline Department of Computer Science} \othermemberB{Professor Franz Kurfess, Ph.D.,\newline Department of Computer Science} \field{Computer Science} \campus{San Luis Obispo}
 \copyrightyears{seven}
 
 
@@ -146,10 +148,8 @@
 Thanks to:
 
 \begin{itemize}
-\item My advisor Alex Dekhtyar, who has been awesome in every regard.
-\item Jane Cleland-Huang, Piotr Pruski, and the TraceLab team for including and supporting me on their project.
-\item My girlfriend Giselle Griffin, who has encouraged me every step of the way.
-\item My parents and my family for supporting me always.
+\item My advisor Zo{\"e} Wood, for being literally the coolest.
+\item My parents for money and love.
 \end{itemize}
 
 \end{acknowledgements}
@@ -188,9 +188,9 @@ Thanks to:
 \bibliography{Bibliography}
 %\addcontentsline{toc}{chapter}{Bibliography}
 
-\begin{appendix}
-%\addcontentsline{toc}{chapter}{\appendixnamelower}
-\include{Appendix}
-\end{appendix}
+%\begin{appendix}
+%%\addcontentsline{toc}{chapter}{\appendixnamelower}
+%\include{Appendix}
+%\end{appendix}
 
 \end{document}
