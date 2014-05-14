@@ -48,9 +48,11 @@ Jester has convenience functions to handle the resolution of bone position from 
 
 \section{Plugin Architecture}
 
-The Jester core provides the functionality that is 
+The Jester core provides the functionality that is not sensor or system setup dependent. The previous section touched on the design of the sensor wrapper and data fusion classes in order to explain the Jester data flow. This section will detail the design of the modular components of Jester. Sensor API interaction, sensor fusion, and data filtering are all parts of the skeletal data input process that may need to change widely for different system implementations. So, the supporting base classes are designed to provide the basics while allowing developers to easily create custom modules.
 
 \subsection{Sensor Wrappers}
+
+The design of the Jester sensor wrappers is probably the simplest of any class in the entire system. Developers will frequently have to be able to create their own custom wrappers for different sensor APIs because there are so many, and the core concept of Jester is to be able to support as many different sensors as possible. 
 
 	set position, orientation
 	initialize
