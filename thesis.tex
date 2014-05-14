@@ -18,8 +18,9 @@
 
 \usepackage{url}
 \usepackage{multicol}
-\ifpdf
+\usepackage{cite}
 
+\ifpdf
     \usepackage[pdftex]{graphicx}
     % Update title and author below...
     \usepackage[pdftex,plainpages=false,breaklinks=true,colorlinks=true,urlcolor=blue,citecolor=blue,
@@ -68,7 +69,7 @@
 
 \usepackage{amssymb}
 \usepackage{amsmath}
-\usepackage[letterpaper]{geometry}
+\usepackage[letterpaper,papersize={8.5in,11in}]{geometry}
 \usepackage[overload]{textcase}
 \usepackage[toc,page]{appendix}
 
@@ -83,13 +84,14 @@
 \floatstyle{boxed}
 \restylefloat{table}
 
-\bibliographystyle{abbrv}
+%\bibliographystyle{abbrv}
 
 \setlength{\parindent}{0.25in} \setlength{\parskip}{6pt}
 
 \geometry{verbose,nohead,tmargin=1.25in,bmargin=1in,lmargin=1.5in,rmargin=1.3in}
 
-\setcounter{tocdepth}{2}
+\setcounter{tocdepth}{3}
+\setcounter{secnumdepth}{3}
 
 
 % Different font in captions (single-spaced, bold) ------------
@@ -109,8 +111,6 @@
 \makeatother   % Cancel the effect of \makeatletter
 % ---------------------------------------
 
-
-
 \begin{document}
 
 % Declarations for Front Matter
@@ -122,10 +122,8 @@ for Skeletal Tracking Sensors}
 \author{Kevin Schapansky}
 \degreemonth{June} \degreeyear{2014} \degree{Master of Science}
 \defensemonth{June} \defenseyear{2014}
-\numberofmembers{3} \chair{Professor Zo{\"e}, Ph.D.,\newline Department of Computer Science} \othermemberA{Assistant Professor Chris Lupo, Ph.D.,\newline Department of Computer Science} \othermemberB{Professor Franz Kurfess, Ph.D.,\newline Department of Computer Science} \field{Computer Science} \campus{San Luis Obispo}
+\numberofmembers{3} \chair{Professor Zo{\"e} Wood, Ph.D.,\newline Department of Computer Science} \othermemberA{Assistant Professor Chris Lupo, Ph.D.,\newline Department of Computer Science} \othermemberB{Professor Franz Kurfess, Ph.D.,\newline Department of Computer Science} \field{Computer Science} \campus{San Luis Obispo}
 \copyrightyears{seven}
-
-
 
 \maketitle
 
@@ -166,7 +164,6 @@ Thanks to:
 
 \renewcommand{\baselinestretch}{1.66}
 
-
 % ------------- Main chapters here --------------------
 
 \include{chapters/Introduction}
@@ -188,7 +185,7 @@ Thanks to:
 \clearpage
 \bibliographystyle{plain}
 \bibliography{Bibliography}
-%\addcontentsline{toc}{chapter}{Bibliography}
+\addcontentsline{toc}{chapter}{Bibliography}
 
 %\begin{appendix}
 %%\addcontentsline{toc}{chapter}{\appendixnamelower}
