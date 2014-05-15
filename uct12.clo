@@ -368,7 +368,8 @@
 % highest-level sectioning command that is to produce section numbers.
 %
  
-\setcounter{secnumdepth}{2}
+\setcounter{tocdepth}{3}
+\setcounter{secnumdepth}{3}
  
 % APPENDIX
 %
@@ -380,7 +381,7 @@
 %    -- redefine the \chapter command if appendix titles and headings
 %       are to look different from chapter titles and headings.
  
-%\def\appendix{\par
+%c\def\appendix{\par
 %  \setcounter{chapter}{0}%
 %  \setcounter{section}{0}%
 %  \def\thechapter{\Alph{chapter}}
