@@ -24,7 +24,7 @@ When the Controller::suggestBoneInfo(...) or Controller::suggestJointInfo(...) a
 
 Once the sensor data has been fused into a cohesive skeletal model, the only remaining step is to provide access for applications. The controller provides a getter function to retrieve a pointer to the scene root class. The scene root is the parent of the skeleton and contains accessor methods to retrieve the individual bone positions. The process of initializing the Jester core and retrieving the skeleton for the first time requires less than 10 lines of code.
 
-\subsection{Scene Graph and Hierarchical Skeletal Model}
+\subsection{Scene Graph and Hierarchical Skeletal Model}\label{sec:bone_hierarchy}
 
 In computer graphics and animation the human skeleton is generally represented as a hierarchical model where each bone position depends on the position of the previous bone. Hierarchical modeling is a good analog to how the human skeleton actually behaves. For example if a person swivels her upper arm, or humerus, at her shoulder but does not change her elbow or wrist angle the position of her hand still changes. Rather than marching down the chain of bones affected by the humerus and updating their 3D position every time there is a small change in parent position it is much more efficient to store each bones position relative to its parent. With relative positioning, parent position changes are automatically reflected when the child position is resolved.
 
@@ -50,7 +50,7 @@ Jester has convenience functions to handle the resolution of bone position from 
 
 The Jester core provides the functionality that is not sensor or system setup dependent. The previous section touched on the design of the sensor wrapper and data fusion classes in order to explain the Jester data flow. This section will detail the design of the modular components of Jester. Sensor API interaction, sensor fusion, and data filtering are all parts of the skeletal data input process that may need to change widely for different system implementations. So, the supporting base classes are designed to provide the basics while allowing developers to easily create custom modules.
 
-\subsection{Sensor Wrappers}
+\subsection{Sensor Wrappers}\label{sec:sensor_wrappers}
 
 The design of the Jester sensor wrappers is probably the simplest of any class in the entire system. Developers will frequently have to be able to create their own custom wrappers for different sensor APIs because there are so many, and the core concept of Jester is to be able to support as many different sensors as possible. Due to the flexibility requirements, the specific implementation of each sensor wrapper internals is completely left to the developer. The only requirements are that the developer's sensor class be a subclass of Jester::Sensor and that it delivers data to the Jester skeleton by calling Controller::suggestJointInfo(...). 
 
