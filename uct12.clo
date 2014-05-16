@@ -368,8 +368,6 @@
 % highest-level sectioning command that is to produce section numbers.
 %
  
-\setcounter{tocdepth}{3}
-\setcounter{secnumdepth}{3}
  
 % APPENDIX
 %
