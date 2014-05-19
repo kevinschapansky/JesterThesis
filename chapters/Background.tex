@@ -62,7 +62,7 @@ Stereo camera systems are, at their simplest level, two of the same model of cam
 
 One well known assisted stereo camera is the LeapMotion Controller. The LeapMotion Controller uses two cameras augmented with three infrared LEDs and is placed on a desktop facing upwards at a user’s hands. It resolves the distance to the hands and attempts to pick out the user’s individual fingers \cite{weichert2013analysis}. The LeapMotion Controller has an API that can be queried for hand and finger position. The Jester usage example presented in this paper uses the Leap API and will be discussed in greater detail in section \ref{sec:leap_impl}.
 
-\section{Filtering Algorithms}
+\section{Filtering Algorithms}\label{sec:filter_back}
 
 Positional data that comes from any real world sensor is subject to some level of noise and inaccuracy. Filtering algorithms attempt to establish some sort of likelihood model for new sensor readings in order to “trust” good measurements more than bad measurements. This is particularly useful for skeletal tracking sensors because tracking errors can sometimes occur that cause the estimated position of bones to jump wildly and then return to a consistent track. Good filtering algorithms will not assign much weight to the jumping measurements and so the filtered skeleton will be much more stable. Two filters that are well documented and have a strong following are Kalman filters and particle filters. Jester supports filtering plugins and an example particle filter has been implemented
 
