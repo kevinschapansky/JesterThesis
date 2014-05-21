@@ -1,5 +1,19 @@
 \chapter{Conclusion}
+
+Jester successfully creates a framework that can be easily used to abstract the process of creating an application that uses skeletal tracking sensors. It also provides an extensible method for fusing data from multiple sources, which has not been done up to this point. Jester's data path and default data fusion implementation provide real time performance on a relatively old system. There are still improvements that would allow Jester to be even more useful to application developers.
+
 \section{Viability}
+
+All of the short term goals of Jester have been met: sensor wrappers are modular and easily creatable, basic data fusion exists and is simple to modify, and it does not create an unreasonable overhead. A community of developers willing to create sensor wrappers would be helpful to increase the incentive for developer adoption, and a beta period would be a good idea to iron out any kinks that may appear as usage increases. Jester is essentially ready to be deployed to developers in beta form.
+
 \section{Future Work}
+
+There are some features that could be incorporated into Jester that would increase the quality of the data produced and would make it even more appealing. It makes sense that there would be use cases for Jester where the sensors in the system cannot provide bone position for all of the bones in the Jester skeleton. Currently, Jester assumes that the unknown bones are in a default position and can cause the skeleton to distort strangely. Also, skeletal sensors can sometimes provide bone positions that are not humanly possible. Storing knowledge about range of motion and the movement axes of joints would improve system accuracy.
+
 \subsection{Inverse Kinematics}
-\subsection{Joint Probabilities}
+
+Inverse kinematics (IK) is the study of how to reconstruct the position of a kinematic chain given the position of an end effector \cite{tolani2000real}. There has been extensive research into reconstructing the joint angles in robotic arms in order to effectively drive a grabber or tool into the correct position. These algorithms can be applied to the problem of partial skeletal knowledge in order to create a more consistent skeleton. Jester would support IK by providing a base template that is fed to the data fusion module in exactly the same way as data filters. IK can be very computationally demanding so careful attention would have to be paid to the overhead of whatever algorithm is chosen.
+
+\subsection{Range of Motion and Joint Types}
+
+The human skeleton has very documented limitations on range of motion. Also the skeleton has different types of joints. For example, the shoulder approximates a ball and socket joint and can move the humerus fairly freely while the elbow is a hinge joint and can only move the radius along one axis. Incorporating this knowledge into the Jester core bone model would allow data fusers to check if the data from the sensors is physically possible in order to provide a much more accurate skeleton that would resist the tendency that some sensors have of creating invalid skeletons.
