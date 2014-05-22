@@ -39,6 +39,13 @@ There are many different sensors that have begun to become popular in the consum
 
 Wearable sensors require that either trackable objects or the actual sensor itself is placed on the body part that the user wishes to track. They have the advantage of being very resistant to interference from ambient light, and are generally more accurate than other approaches. The trade off is that there is more setup time involved to place sensors and each bone or joint requires a separate sensor or marker \cite{zhu2004real}. Figure \ref{fig:wearables} shows the wearable sensors that will be discussed in sections \ref{sec:sixense}, \ref{sec:oculus}, and \ref{sec:prio}. 
 
+\begin{figure}[h]
+\centering
+\includegraphics[width=1\textwidth]{figures/wearables}
+\caption{Wearable sensors. Left to Right: Sixense STEM, Oculus Rift, PrioVR Suit. Source: Press Materials \cite{sixense_stem} \cite{oculus2012oculus}, \cite{priovr}}
+\label{fig:wearables}
+\end{figure}
+
 \subsubsection{Sixense STEM}\label{sec:sixense}
 
 The Sixense STEM system can track up to 3 remote tags, STEM packs, and two handheld controllers in the x, y, and z dimensions as will the roll, pitch, and yaw, known as six degrees of freedom, using magnetic field sensors (6 DOF) \cite{sixense_stem}. Relying on magnetic field rather than some sort of visual sensor means that the STEM system is impervious to any sort of lighting or UV interference. Using the STEM system with Jester would be as simple as getting the controller and STEM pack data from the Sixense API, associating the data points with the correct Jester bones or joints, and calling the newData() function on the Jester Controller.
