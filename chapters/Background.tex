@@ -16,6 +16,13 @@ Jester spaces are specified in the traditional 3D computer graphics style where 
 
 Quaternions are a complex mathematical construct that effectively stores a 3D axis and the amount of rotation around that axis. They are less intuitive, but they allow rotations to be combined without the possibility of the gimbal lock problem that can occur when specifying a rotation as an euler rotation which is a combination of separate cascading rotations about the x, y, and z axes. Gimbal lock occurs when rotation about one axis causes the other two axes to be on the same plane. If two axes are coplanar a degree of freedom has essentially been lost \cite{gortler2012foundations}. Figure \ref{fig:gimbal_lock} demonstrates how a 90 degree rotation about the z axis causes the y and x axes to both specify rotation about the y axis.
 
+\begin{figure}[h]
+\centering
+\includegraphics[width=0.75\textwidth]{figures/gimbals}
+\caption{Gimbal lock when two axes are rotated onto the same plane. Credit: "MathsPoetry" (Wikipedia Commons)}
+\label{fig:gimbal_lock}
+\end{figure}
+
 \section{Sensor Types}
 
 There are many different sensors that have begun to become popular in the consumer 3D input device market. They can be broadly broken into two categories: devices that require the user to wear trackable markers or sensors, and devices that use some form of imaging technology to observe the scene. Both categories contain many sub-types. Some current commercial examples will be examined and broadly explained. Jester is capable of working with any sensor that can produce data about a joint’s or bone’s position and orientation. The process of using the sensor with Jester will be explained briefly below. More detail about the Jester API and its use can be found in section \ref{sec:sensor_wrappers}. 
