@@ -40,7 +40,7 @@ The data fusion requirements for the sample application are very close to being 
 
 The LeapMotion Controller provides very stable data, but the PrimeSense Carmine is prone to having joint positions suddenly "jump" from their correct location to a wildly incorrect position and then reset. So, the system stability can seriously benefit from filtering. This thesis implements a sample particle filter to attempt to reduce the system noise.
 
-\subsection{Particle Filter}\label{sec:filer_impl}
+\subsection{Particle Filter}\label{sec:filter_impl}
 
 A particle filter was selected because it is good for applications where a system dynamics model is difficult or impossible to create as discussed in section \ref{sec:filter_back}. The mathematical justification for particle filters is beyond the scope of this thesis, so only implementation level details will be discussed.
 
