@@ -23,7 +23,21 @@ Jester’s sensor wrappers and data fusion units need to be flexible in order to
 
 Jester requires a data path that does not rely on sensors having any knowledge of the internal skeletal model or any other sensors that may present in order to allow sensor modules to be truly modular. So, there must be a black box style system for passing data from the sensor wrappers to the data fuser and then into the internal skeletal model. 
 
-The data path, illustrated in figure \ref{fig:broad_datapath}, centers around a controller class. The controller is constructed with a pointer to a data fusion class factory that is chosen or implemented by the application developer and is the center of a multi-step setup process depicted in figure \ref{fig:const_order} and described here. The Jester core comes with a data fusion implementation and factory that is adequate for straightforward fusion requirements; its design and implementation are discussed in section \ref{sec:fuser_des_impl}. When the controller is constructed using the constructor depicted in figure \ref{fig:broad_datapath}, it invokes the data fusion factory and then constructs an instance of the scene class with a pointer to the factory. The scene class is the root of the hierarchical skeletal model and is responsible for constructing and providing access to the bones that make up the skeleton. The scene class functionality is explained in section \ref{sec:scene_impl}. The controller then sets the newly created scene class to be the root space of the data fusion module in order to provide a common space in which to unite measurements and allow the fuser to cooperate with the scene to resolve race conditions discussed later. The controller, and therefore the scene and skeleton, must be constructed before individual sensors because sensors are a part of the scene graph along with the skeleton. The scene graph will be thoroughly explained in section \ref{sec:bone_hierarchy}, but, briefly, placing sensors in the scene graph allows sensors to be mounted to body parts and automatically handled by the space unification system discussed in section \label{sec:bone_hierarchy}. 
+\begin{figure}[]
+\centering
+\includegraphics[width=1\textwidth]{figures/mainDataFlow}
+\caption{The Jester core classes and dataflow paths.}
+\label{fig:broad_datapath}
+\end{figure}
+
+The data path, illustrated in figure \ref{fig:broad_datapath}, centers around a controller class. The controller is constructed with a pointer to a data fusion class factory that is chosen or implemented by the application developer and is the center of a multi-step setup process depicted in figure \ref{fig:const_order} and described here. The Jester core comes with a data fusion implementation and factory that is adequate for straightforward fusion requirements; its design and implementation are discussed in section \ref{sec:fuser_des_impl}. When the controller is constructed using the constructor depicted in figure \ref{fig:broad_datapath}, it invokes the data fusion factory and then constructs an instance of the scene class with a pointer to the factory. The scene class is the root of the hierarchical skeletal model and is responsible for constructing and providing access to the bones that make up the skeleton. The scene class functionality is explained in section \ref{sec:scene_impl}. The controller then sets the newly created scene class to be the root space of the data fusion module in order to provide a common space in which to unite measurements and allow the fuser to cooperate with the scene to resolve race conditions discussed later. The controller, and therefore the scene and skeleton, must be constructed before individual sensors because sensors are a part of the scene graph along with the skeleton. The scene graph will be thoroughly explained in section \ref{sec:bone_hierarchy}, but, briefly, placing sensors in the scene graph allows sensors to be mounted to body parts and automatically handled by the space unification system discussed in section \ref{sec:bone_hierarchy}. 
+
+\begin{figure}[]
+\centering
+\includegraphics[width=1\textwidth]{figures/constructionOrder}
+\caption{The Jester core construction order. Each column represents the task of that class or object. Vertical alignment denotes timing.}
+\label{fig:const_order}
+\end{figure}
 
 Once the controller and scene are initialized, the application constructs the sensor classes for the sensors that are present in the system. Jester does not detect available sensors because there are simply too many different kinds and some setup specific manual configuration, discussed in section \ref{sec:sensor_wrappers}, is necessary. The sensor base class constructor requires pointers to the sensor’s scene graph parent and the controller. The scene graph parent pointer is necessary to provide a spatial context for the sensor measurements and will be discussed in sections \ref{sec:scene_impl}. The Jester controller provides a pair of functions called Controller::suggestBoneInfo(...) and Controller::suggestJointInfo(...) that allow the sensor class to asynchronously feed data into Jester when it arrives from the sensor API and without any knowledge of the timing issues, discussed in section \ref{sec:fuser_des_impl} that arise from having multiple sensors present in the same system.
 
@@ -35,11 +49,25 @@ Once the sensor data has been fused into a cohesive skeletal model, the only rem
 
 In computer graphics and animation the human skeleton is generally represented as a hierarchical model where each bone position depends on the position of the previous bone. Hierarchical modeling is a good analog to how the human skeleton actually behaves \cite{parent2012computer}. For example if a person swivels her upper arm, or humerus, at her shoulder but does not change her elbow or wrist angle the position of her hand still changes as illustrated in figure \ref{fig:arm_swivel}. Rather than marching down the chain of bones affected by the humerus and updating their 3D position every time there is a small change in parent position it is much more efficient to store each bones position relative to its parent. With relative positioning, parent position changes are automatically reflected when the child position is resolved.
 
+\begin{figure}[]
+\centering
+\includegraphics[width=1\textwidth]{figures/upDownSwivel}
+\caption{The position of the hand changes greatly when the shoulder is swivelled, even if the elbow angle does not change.}
+\label{fig:arm_swivel}
+\end{figure}
+
 Jester uses a spatial mathematics library called OpenGL Mathematics (GLM). GLM is a header only C++ library and so can be used on any system with a C++ compiler. It is designed to provide all of the functionality that a graphics application would need, and provides all of the quaternion, vector, and matrix operations needed for Jester. There are many solid math libraries, but GLM is commonly used in the graphics community because it is designed to mirror the GLSL API used in OpenGL programming \cite{glm}.
 
 \subsubsection{Hierarchical Skeleton}\label{sec:bone_hierarchy}
 
 In Jester, each bone stores a length, 3D start position in reference to the end of the parent, and an orientation as a quaternion with respect to the parent orientation. Each bone creates its own space where the bone runs down the positive Z axis. In order to take a point in one bone’s space and transform it to its parent’s space Jester creates a 4x4 matrix by translating an identity matrix by the bone’s starting position and then multiplying the new matrix by a rotation matrix derived from the bone orientation quaternion. The resulting matrix is known as the transform for the bone’s space and can translate any point from the bone’s space to its parent’s space. To transform a point from bone space all the way to world space, or the root space for the application, the 4x4 transforms for each bone in the hierarchy are multiplied to form one world transform. Similarly, the rotation of a bone in its parent’s space, and, by extension, world space, can be determined by multiplying the orientation quaternions together until the desired space is reached. The chaining of bone spaces can be visualized as seen in figure \ref{fig:joint_spaces}. Rendering a bone in OpenGL is as simple as rendering a cylindrical triangle mesh with a model matrix that is defined by scaling the bones world space transform by the whatever width the developer desires and the bones internally stored length.
+
+\begin{figure}[]
+\centering
+\includegraphics[width=.5\textwidth]{figures/spaceChain}
+\caption{Each bone in the kinematic chain has its own basis space defined by its orientation relative to its parent.}
+\label{fig:joint_spaces}
+\end{figure}
 
 Jester's reduced bone set maps well to the bones that can be tracked by current skeletal sensors. Figure \ref{fig:skeleton} shows the bones that have been selected. The Jester skeleton is hierarchically based on a fictional "root bone" that is is placed at the midpoint of the pelvis. A fictional bone is used because there is no centrally placed bone in the human torso that does not have other bones attached at both ends. Having children bones only placed at one end of the root allows the system to have one consistent pivot point and simplify the conceptual complexity. The head was not selected for the root because placing the head at the root would essentially rotate the entire body as the head is turned, which is not consistent with what happens in reality.
 
