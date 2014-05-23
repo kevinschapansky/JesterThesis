@@ -80,21 +80,49 @@ Jester's reduced bone set maps well to the bones that can be tracked by current 
 
 The skeletal bones themselves compose just one part of the scene graph provided by Jester. All components of the scene graph are children of the parent class Jester::SceneGraphNode. Jester::SceneGraphNode provides the base functionality for calculating the local and world position, orientation, and transform. It also tracks the node’s children and parent. Providing a generic base class for the Jester scene graph allows developers to easily incorporate the Jester scene graph into their application rather than building a custom one. If developers want to add things besides sensors to the scene graph they just have to extend the Jester::SceneGraphNode superclass. The built in scene graph inheritance is depicted in figure \ref{fig:scene_graph_inh}.
 
+\begin{figure}[]
+\centering
+\includegraphics[width=.75\textwidth]{figures/sceneInh}
+\caption{Jester's scene graph inheritance hierarchy.}
+\label{fig:scene_graph_inh}
+\end{figure}
+
 Jester’s abstract Sensor class is a subclass of Jester::SceneGraphNode. Placing Sensors in the scene graph greatly simplifies the process of merging the data from different sensors. Most sensors provide bone data with respect to their space; meaning that if the sensor is moved but the sensed bone is not the sensor will think that the bone is what moved. Similarly, two identical sensors placed side by side will track the same bones but report slightly different positions. Most sensors are statically mounted on tabletops or walls, but it makes sense to mount some sensors on the human skeleton itself. For instance, a user could mount a hand tracking sensor on her head mounted display so that she could turn to look at virtual objects and then interact with them naturally without worrying about the sensor field of view like she would if it was placed on a desk. Including sensors in the scene graph makes it possible to simply use the world space transform provided by Jester::SceneGraphNode to move sensed bone positions into Jester’s world space. 
 
 \subsubsection{Scene Root}\label{sec:scene_impl}
 
 The root of the Jester scene graph is the Jester::Scene class. It provides the base space for all scene graph nodes as well as accessor functionality for the bones that make up the skeleton. While the Jester::SceneGraphNode class provides access to an std::iterator that makes it possible to traverse the skeleton by starting at the scene root and recursively iterating over all of the children of each node, that process would be unnecessarily cumbersome if the user just wants to access a specific bone. So, the scene class provides a function called Scene::getBone(...) that takes the ID of the desired bone and returns a pointer to the correct bone object.
 
+\begin{figure}[h]
+\centering
+\includegraphics[width=1\textwidth]{figures/dataRace}
+\caption{Not synchronizing the process of updating and setting the skeleton can result in wildly incorrect skeletal data.}
+\label{fig:data_race}
+\end{figure}
+
 The scene class also cooperates with the data fuser to provide a consistent and up to date skeleton. If the data fuser actively modified the same bone objects that are in the scene, there is a possibility that applications could render an inconsistent skeleton. Since both the data fuser and applications access the skeleton in pieces and are operating concurrently in separate threads, there is an inherent race condition illustrated in figure \ref{fig:data_race}. If a single threaded client application is attempting to render the current position of the user’s right arm, it will access the position of the humerus, then the position of the radius, and then the fingers. If the data fuser updates the position of the arm before the client accesses the radius but after the position of the humerus, the bones could be rendered disconnected from each other.
 
 Jester solves the inconsistency problem by using a double buffering approach shown in figure \ref{fig:double_buffer}. The scene holds two sets of skeletons; one for the data fuser to update and one for the client application to read. Both skeletons are updated whenever the SceneGraphNode::addChild(...) or SceneGraphNode::removeChild(...) functions are called. The data fuser notifies the scene when it is about to modify the skeleton by calling Scene::beginSkeletonUpdate() and when it is done by calling Scene::finishSkeletonUpdate(). Locking the fusion skeleton tells the scene that it should not swap the skeletons while the data fuser is in the process of changing data. Client applications call Scene::refreshSkeleton() when they want the most up to date complete skeleton. Scene::refreshSkeleton() checks if the skeleton is currently being updated. If it is, then the client thread is blocked until the data fuser is done updating or a short timeout expires. The timeout allows the client application to not stall for long if the data fuser is hanging in order to help ensure that the client UI does not lock. Once the block is released without timeout or if the skeleton was not currently being updated, the scene enables a lock in Scene::beginSkeletonUpdate() to make the fuser wait, swaps the two skeletons so that the client application gets the most up to date data and the data fuser gets a new skeleton to modify, and disables the lock in Scene::beginSkeltonUpdate() to allow the fuser to continue. Double buffering in this manner allows Jester to support multithreaded data fusion while preventing the possibility of providing an inconsistent skeleton.
+
+\begin{figure}[]
+\centering
+\includegraphics[width=1\textwidth]{figures/doubleBuffer}
+\caption{Double buffering the skeleton prevents the race condition from figure \ref{fig:data_race}.}
+\label{fig:double_buffer}
+\end{figure}
 
 \subsection{Joints}
 
 The position of many bones in the human body can be determined using the joints that they connect. For example, the position of the radius can be completely determined using the position of the wrist and elbow joints. Many sensors, like the PrimeSense Carmine, report skeletal position using joints instead of bones. So, the Jester framework accepts skeletal data as bone position or joint position. Bone position maps directly into the Jester skeleton, but joint data requires some special handling.
 
 Jester has convenience functions to handle the resolution of bone position from the position of two joints. The Jester::Bone class provides enumerations for all of the bones that are supported by Jester and all of the joints that can be used to define those bones as well as a map that takes a bone ID and returns the pair of joint IDs that defines it. The Jester fusion module superclass, Jester::DataFusionModule, provides a function called getBonesFromJoints(...) that resolves bone positions by looping through the bones that are supported by Jester and checking to see if the joints mapped to each bone were provided. If both Joints were provided, the function simply sets the bone to start at the start joint and terminate at the end joint. Since not all sensors provide information about all of the joints supported by Jester, it is possible that a bone could be missing one or both joints. It is useful to provide default joint positions that can be used if joints are missing. For example, if a system only uses a LeapMotion Controller, it will be able to track the user’s wrist position but not his elbow. Jester can still create a skeleton with just the wrist positions by using the default joint positions for the unmapped joints. Assuming default joint position frequently results in distorted bone lengths as shown in figure \ref{fig:distorted_bones}, but it is not possible to infer joint position without a true inverse kinematics engine. We have decided that, for Jester, it is better to provide a possibly inaccurate skeleton than to force users to have sensors tracking every joint in order to get any data.
+
+\begin{figure}[]
+\centering
+\includegraphics[width=.3\textwidth]{figures/distortedBones}
+\caption{Using data from a sensor that only provides data from one joint that defines a bone results in distorted bones.}
+\label{fig:distorted_bones}
+\end{figure}
 
 \section{Plugin Architecture}
 
