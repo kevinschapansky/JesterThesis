@@ -153,7 +153,18 @@ Jester sensor wrappers operate in separate threads, so the sensor fusion module 
 \label{fig:skeleton_frames}
 \end{figure}
 
-SendorFusionModule::newData(...) accepts skeletal information as either bones or joints and Jester operates internally using bones; both data input processes are illustrated in figure \ref{fig:new_data_flow}. So, joints are transformed into bone data using the bone to joint lookup map discussed in the datapath section. If there is a filtering module present the fuser sends the new bone to the filter and then replaces the sensed position with the one given by the filter. The fuser then checks if there is any information about the new bones already in the current skeletal frame. If the data has not been set yet or is from the same sensor, the new bone position is inserted. If there is data from a different sensor, then the new position is fused by interpolating between the competing bone start positions and quaternions using a weighting equating that is a combination of the confidence supplied by the sensor reading and the scaling value for that bone [math and explain]. The frame is advanced if all of the sensors have contributed to the current frame once the data is inserted and fused. 
+SendorFusionModule::newData(...) accepts skeletal information as either bones or joints and Jester operates internally using bones; both data input processes are illustrated in figure \ref{fig:new_data_flow}. So, joints are transformed into bone data using the bone to joint lookup map discussed in the datapath section. If there is a filtering module present the fuser sends the new bone to the filter and then replaces the sensed position with the one given by the filter. The fuser then checks if there is any information about the new bones already in the current skeletal frame. If the data has not been set yet or is from the same sensor, the new bone position is inserted. If there is data from a different sensor, then the new position is fused by interpolating between the competing bone start positions and quaternions using a weighting equation that is a combination of the confidence supplied by the sensor reading and the scaling value for that bone:
+
+\center{$SF = \frac{N_{SF} * N_{C}}{(N_{SF} * N_{C}) + (C_{SF} * C_{C})}$}
+
+$SF$ is the scaling factor for interpolation, $N_{SF}$ and $N_{C}$ are the new position's scaling factor and confidence, and $C_{SF}$ and $C_{C}$ are the current position’s scaling factor and confidence. The frame is advanced if all of the sensors have contributed to the current frame once the data is inserted and fused. 
+
+\begin{figure}[]
+\centering
+\includegraphics[width=1\textwidth]{figures/insertionDataflow}
+\caption{How new joint or bone data is fed into the skeletal frame.}
+\label{fig:new_data_flow}
+\end{figure}
 
 The length of the skeleton frame history, the number of frames to go back in time when setting the scene skeleton, and the amount of time before the frame is auto-advanced are all easily configurable to match the real time needs of the system. Frequent updates are more demanding, but provide a more current system if the sensors can keep up. The new data handling process is all handled with virtual methods, so data fusion implementations can easily change the data handling for some bones while invoking the default fusion functions with others. An example of small modifications to the fusion system is given in section \ref{sec:fuser_impl}.
 	
