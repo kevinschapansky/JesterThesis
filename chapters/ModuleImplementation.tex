@@ -20,7 +20,21 @@ This thesis resolves right and left hand position using a set of assumptions tha
 
 These rules have been experimentally determined to be effective most of the time. However, it is possible for the Controller to become confused and swap the hands it is tracking. The hands can be reset by withdrawing them from the tracking space, waiting a second, and then reinserting.
 
-Finger tracking in the Leap is a bit more complex. Using the X-axis position of the fingers is unreliable in situations where the hands are rotated like in figure \ref{fig:hand_rotate}. The API attempts to provide a vector that points along the hand direction, but it is unreliable. This thesis's implementation uses a calibration pose to solve the finger ambiguity issue. The wrapper waits until all five fingers are visible on the hand, and then assumes that the thumb is the inside finger along the X-axis and the rest of the fingers are placed normally with respect to that orientation as shown in figure \ref{fig:hand_rotate}. It then retrieves the length of each finger from the LeapMotion API and assigns it to that hand for the rest of that hand IDs life. Next, it gets the finger IDs from the API and assigns them in the same manner. Whenever a finger ID is lost, the wrapper stops reporting information about that finger. When an unknown finger ID is attached to the hand, the wrapper finds the finger on the hand that is not currently being tracked and has the closest length to the new finger. The new finger's ID is then assigned to that finger. This process is detailed in figure \ref{fig:finger_matching}. 
+\begin{figure}[]
+\centering
+\includegraphics[width=0.5\textwidth]{figures/handsStraight}
+\caption{The user's hands must be placed in front of the LeapMotion Controller with palms down and fingers spread in order to calibrate.}
+\label{fig:hand_default}
+\end{figure}
+
+Finger tracking in the Leap is a bit more complex. Using the X-axis position of the fingers is unreliable in situations where the hands are rotated so that the fingers are pointing outward. The Controller API attempts to provide a vector that points along the hand direction, but it is unreliable. This thesis's implementation uses a calibration pose to solve the finger ambiguity issue. The wrapper waits until all five fingers are visible on the hand, and then assumes that the thumb is the inside finger along the X-axis and the rest of the fingers are placed normally with respect to that orientation as shown in figure \ref{fig:hand_default}. It then retrieves the length of each finger from the LeapMotion API and assigns it to that hand for the rest of that hand IDs life. Next, it gets the finger IDs from the API and assigns them in the same manner. Whenever a finger ID is lost, the wrapper stops reporting information about that finger. When an unknown finger ID is attached to the hand, the wrapper finds the finger on the hand that is not currently being tracked and has the closest length to the new finger. The new finger's ID is then assigned to that finger. This process is detailed in figure \ref{fig:finger_matching}. 
+
+\begin{figure}[]
+\centering
+\includegraphics[width=.75\textwidth]{figures/fingerAssociation}
+\caption{Finger IDs frequently become lost and must be reacquired using the calibrated length.}
+\label{fig:finger_matching}
+\end{figure}
 
 Once the wrapper has calibrated finger length it begins to provide data about finger position. The LeapMotion Controller tracks finger tip position and orientation. Jester stores finger position using the knuckle joint and an imaginary joint placed at the end of the finger. The wrapper converts Controller finger data to Jester finger data by using the tip position as the imaginary end joint and estimating the position of the knuckle joint by moving backwards along the tip vector by the length of the finger.
 
@@ -34,7 +48,14 @@ The wrapper is implemented by setting up a polling thread that is launched when 
 
 \section{Fusion Implementation}\label{sec:fuser_impl}
 
-The data fusion requirements for the sample application are very close to being in line with the default functionality. There just needs to be a method for disambiguating the hand orientation from the LeapMotion Controller. So, the sample data fuser simply extends the default fuser and overrides the DataFusionModule::newData(...) function. The new implementation simply checks if the wrist joints are known in the current skeletal frame. If they are, then it checks if the incoming wrist joints would be closer to the existing positions if the hands were swapped. If the change in difference is larger than a threshold the fuser as shown in figure \ref{fig:error_delta} assumes that the hands need to be swapped. If the incoming data is from the LeapMotion controller, then it creates a new map where the hands and fingers are swapped and then invokes the superclasse's newData(...) function with the new map. In the case where the Leap's finger data has already been placed in the current skeletal frame, the data in the frame is swapped and then the superclass's newData(...) function is called with the unchanged map. This small set of modifications to the base fuser class show that small system modifications are easy in situations where a close to default behavior is desired.
+The data fusion requirements for the sample application are very close to being in line with the default functionality. There just needs to be a method for disambiguating the hand orientation from the LeapMotion Controller. So, the sample data fuser simply extends the default fuser and overrides the DataFusionModule::newData(...) function. The new implementation simply checks if the wrist joints are known in the current skeletal frame. If they are, then it checks if the incoming wrist joints would be closer to the existing positions if the hands were swapped like in figure \ref{fig:hand_swap}. If the change in difference is larger than a threshold the fuser assumes that the hands need to be swapped. If the incoming data is from the LeapMotion controller, then it creates a new map where the hands and fingers are swapped and then invokes the superclasse's newData(...) function with the new map. In the case where the Leap's finger data has already been placed in the current skeletal frame, the data in the frame is swapped and then the superclass's newData(...) function is called with the unchanged map. This small set of modifications to the base fuser class show that small system modifications are easy in situations where a close to default behavior is desired.
+
+\begin{figure}[]
+\centering
+\includegraphics[width=0.5\textwidth]{figures/handSwap}
+\caption{Hand position, represented as shapes, sometimes needs to be swapped due to data ambiguity.}
+\label{fig:hand_swap}
+\end{figure}
 
 \section{Data Filtering}
 
@@ -54,4 +75,19 @@ The filter then generates the bone's filtered position by calculating the statis
 
 \section{Sample Application}\label{sec:app_impl}
 
-The sample application of Jester is mainly designed as a toy to prove that the concept of a sensor abstraction and data fusion framework can be useful. It is only vaguely useful and is only designed to showcase the cooperation between the PrimeSense Carmine and the LeapMotion Controller. Balls slowly fall from the ceiling and can either be deflected away or deleted on contact depending on the user's hand orientation. A huge bulk of the code is devote to handling mouse events, setting up OpenGL, and the simple physics engine. The implementation of all of these tools is outside the scope of this thesis. Jester's setup and query steps are depicted in the pseudo code in figure \ref{fig:jester_setup}. Developers simply have to create the controller, create the sensors, set the sensor position, and start the application. The fact that so little of the application code is dealing with sensors and raw sensor data is a signal of the value of the Jester abstraction framework.
+The sample application of Jester is mainly designed as a toy to prove that the concept of a sensor abstraction and data fusion framework can be useful. It is only vaguely useful and is only designed to showcase the cooperation between the PrimeSense Carmine and the LeapMotion Controller. Balls slowly fall from the ceiling and can either be deflected away or deleted on contact depending on the user's hand orientation. A huge bulk of the code is devote to handling mouse events, setting up OpenGL, and the simple physics engine. The implementation of all of these tools is outside the scope of this thesis. Jester's setup and query steps can be represented in the following steps that map 1:1 to code:
+
+\begin{enumerate}
+  \item Construct Jester Controller with Data Fuser Factory
+  \item Construct Sensor object
+  \item Set sensor orientation
+  \item Set sensor position
+  \item Add sensor to fuser
+  \item Repeat 2-5 for each sensor
+  \item Start sensors
+  \item Get the Scene object from the Controller
+  \item Call Scene::refreshSkeleton()
+  \item Query Scene for bone position to draw skeleton
+\end{enumerate}
+
+The fact that so little of the application code is dealing with sensors and raw sensor data is a signal of the value of the Jester abstraction framework.

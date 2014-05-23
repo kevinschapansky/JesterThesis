@@ -155,7 +155,7 @@ Jester sensor wrappers operate in separate threads, so the sensor fusion module 
 
 SendorFusionModule::newData(...) accepts skeletal information as either bones or joints and Jester operates internally using bones; both data input processes are illustrated in figure \ref{fig:new_data_flow}. So, joints are transformed into bone data using the bone to joint lookup map discussed in the datapath section. If there is a filtering module present the fuser sends the new bone to the filter and then replaces the sensed position with the one given by the filter. The fuser then checks if there is any information about the new bones already in the current skeletal frame. If the data has not been set yet or is from the same sensor, the new bone position is inserted. If there is data from a different sensor, then the new position is fused by interpolating between the competing bone start positions and quaternions using a weighting equation that is a combination of the confidence supplied by the sensor reading and the scaling value for that bone:
 
-\center{$SF = \frac{N_{SF} * N_{C}}{(N_{SF} * N_{C}) + (C_{SF} * C_{C})}$}
+\centerline{$SF = \frac{N_{SF} * N_{C}}{(N_{SF} * N_{C}) + (C_{SF} * C_{C})}$}
 
 $SF$ is the scaling factor for interpolation, $N_{SF}$ and $N_{C}$ are the new position's scaling factor and confidence, and $C_{SF}$ and $C_{C}$ are the current position’s scaling factor and confidence. The frame is advanced if all of the sensors have contributed to the current frame once the data is inserted and fused. 
 
