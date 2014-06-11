@@ -6,7 +6,7 @@ Human interaction applications have an inherent requirement of being soft real t
 
 \section{Jester Sensor Input and Core Performance}
 
-The Jester core is discussed in Section \ref{sec:jester_core}. Its data flow is essentially fixed and will not change based on the requirements of the application. Since every new sensor reading that is generated must be fed through the core to reach the skeletal model speed is essential; especially since the function calls to get data to the data fusion module are blocking. The wall clock time for a new set of joint data to be sent from the sensor wrapper, to the controller, to the data fuser, and then transformed into bones is used. Joint datasets are more computationally expensive than bone sets because they must be translated into bones before they can be used. The average time to feed joint data through the Jester core is shown in Table \ref{tab:core}.
+The Jester core is discussed in Section \ref{sec:jester_core}. Its data flow is essentially fixed and will not change based on the requirements of the application. Since every new sensor reading that is generated must be fed through the core to reach the skeletal model speed is essential; especially since the function calls to get data to the data fusion module are blocking. The wall clock time for a new set of joint data to be sent from the sensor wrapper, to the controller, to the data fuser, and then transformed into bones is used. Joint datasets are more computationally expensive than bone sets because they must be translated into bones before they can be used. The average times to feed joint data through the Jester core is shown in Table \ref{tab:core}.
 
 \begin{table}[h]
 \begin{tabular}{llll}
@@ -36,4 +36,14 @@ Double Exp Filter & 0.02              & 4.698         & 0.001
 
 \section{Combined Performance}
 
+In order to validate the refresh rate of the Jester framework and sample implementation, all of the parts must be evaluated together. The cumulative system time and the resulting refresh rate is shown in Table \ref{tab:total}. Even if all of the worst case times are added, which is highly unlikely in reality, the system still functions at 27.5 hertz. The maximum times in all of the steps are rather extreme outliers. This is most likely because the performance statistics are measured as wall clock time. Thus, there is a large reported performance discrepancy when the operating system de-schedules Jester to perform background tasks. The average performance, gathered over 5000 system iterations, provides a more realistic view of Jester's efficiency. On average, the entire Jester data intake and fusion processes can complete at over 2000 hertz. Therefore, Jester does not add any significant system overhead and will not prevent a client application from functioning in ``real time".
 
+\begin{table}[h]
+\begin{tabular}{llll}
+             & Average Case & Worst Case & Best Case \\
+Total Time   & 0.474        & 36.37      & 0.117     \\
+Refresh Rate & 2110 Hz      & 27.5 Hz    & 8547 Hz  
+\end{tabular}
+\caption{Cumulative system performance times and the resulting refresh rate.}
+\label{tab:total}
+\end{table}
