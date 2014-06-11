@@ -1,15 +1,39 @@
 \chapter{Results}
 
-The primary validation of Jester is the existence of a simple process for creating thin sensor wrappers and simple data fusion modifications. Chapter \ref{chap:sample_app} documented the process of wrapping different skeletal tracking APIs and modifying the data fusion module. A huge bulk of the already relatively small Jester specific work went into creating the sensor wrappers. Ideally, these wrappers could be created by 3rd party developers and then shared, so new application developers would just have to get the already existing wrapper modules from other developers; eliminating a big portion of the setup time.
+The primary validation of Jester is the existence of a simple process for creating thin sensor wrappers and simple data fusion modifications. Chapter \ref{chap:sample_app} documented the process of wrapping different skeletal tracking APIs and modifying the data fusion module. A huge bulk of the already relatively small Jester specific work went into creating the sensor wrappers. Ideally, these wrappers could be created by third party developers and then shared, so new application developers would just have to get the already existing wrapper modules from other developers; eliminating a big portion of the setup time.
 
-Human interaction applications have an inherent requirement of being real time. Users are hesitant to put up with laggy interfaces since modern computers are currently very responsive. So, Jester's internal data flow must not add any significant overhead. Deciding what exactly "real time" means is not necessarily straight forward, but for the purposes of this evaluation a metric must be chosen. This thesis defines real time as meaning that the process can complete before the skeleton tracking sensor is ready with a new data frame. The LeapMotion Controller provides a new frame every [LEAP MS HERE] and the PrimeSenseCarmine provides a new frame every [CARMINE MS HERE]. This chapter outlines the different parts of the Jester data acquisition and fusion process to validate that there is no significant performance bottleneck. All tests are run on a system with an Intel Core 2 Duo 2.6 GHz processor and 4GB of system memory.
+Human interaction applications have an inherent requirement of being soft real time. A system slow down will not cause catastrophic failure, but users are hesitant to put up with high latency interfaces since modern computers are currently very responsive. So, Jester's internal data flow must not add any significant overhead. Deciding what exactly "real time" means is not necessarily straight forward, but for the purposes of this evaluation a metric must be chosen. Video games typically require at least 30 fps in order to appear to be fluid. This thesis defines real time as meaning that the Jester data intake and fusion process can loop at a minimum of 30 hertz. This chapter outlines the different parts of the Jester data acquisition and fusion process to validate that there is no significant performance bottleneck. All tests are run on a system with an Intel Core 2 Duo 2.6 GHz processor and 4GB of system memory.
 
-\section{Jester Core Performance}
+\section{Jester Sensor Input and Core Performance}
 
-The Jester core is discussed in section \ref{sec:jester_core}. Its data flow is essentially fixed and will not change based on the requirements of the application. Since every new sensor reading that is generated must be fed through the core to reach the skeletal model speed is essential; especially since the function calls to get data to the data fusion module are blocking. The wall clock time for a new set of joint data to be sent from the sensor wrapper, to the controller, to the data fuser, and then transformed into bones is used. Joint datasets are more computationally expensive than bone sets because they must be translated into bones before they can be used. The average time to feed data through the Jester core was [DATA HERE MS].
+The Jester core is discussed in Section \ref{sec:jester_core}. Its data flow is essentially fixed and will not change based on the requirements of the application. Since every new sensor reading that is generated must be fed through the core to reach the skeletal model speed is essential; especially since the function calls to get data to the data fusion module are blocking. The wall clock time for a new set of joint data to be sent from the sensor wrapper, to the controller, to the data fuser, and then transformed into bones is used. Joint datasets are more computationally expensive than bone sets because they must be translated into bones before they can be used. The average time to feed joint data through the Jester core is shown in Table \ref{tab:core}.
+
+\begin{table}[h]
+\begin{tabular}{llll}
+Data Step                        & Average Time (ms) & Max Time (ms) & Min Time (ms) \\
+Leap Data -\textgreater Fuser    & 0.134             & 6.108         & 0.026             \\
+Carmine Data -\textgreater Fuser & 0.125             & 11.58         & 0.06              \\
+Skeleton Update                  & 0.049             & 3.74          & 0.004
+\end{tabular}
+\caption{Jester core data flow performance.}
+\label{tab:core}
+\end{table}
 
 \section{Data Fuser Performance}
 
-The data fusion module is the most computationally expensive part of the Jester framework. It handles all of the functionality described in section \ref{sec:fuser_des_impl}. Different fusion algorithms and filtering methods could have a profound impact on the fusion performance. A fuser that simply passes new data directly to the skeleton would finish almost instantaneously while a fuser that does extensive inverse kinematics or filtering could be so slow that it is no longer real time. The performance of the data fusion unit with the small modification described in section \ref{sec:fuser_impl} with and without the filtering module from section \ref{sec:filter_impl} will be evaluated.
+The data fusion module is the most computationally expensive part of the Jester framework. It handles all of the functionality described in Section \ref{sec:fuser_des_impl}. Different fusion algorithms and filtering methods could have a profound impact on the fusion performance. A fuser that simply passes new data directly to the skeleton would finish almost instantaneously while a fuser that does extensive inverse kinematics or filtering could be so slow that it is no longer real time. The performance of the data fusion unit with the small modification described in Section \ref{sec:fuser_impl} with and without the filtering module from Section \ref{sec:filter_impl} are shown in Table \ref{tab:fuser}.
 
-[INSERT DATA FUSION TIMINGS]
+\begin{table}[h]
+\begin{tabular}{llll}
+Data Step         & Average Time (ms) & Max Time (ms) & Min Time (ms) \\
+Data Fusion       & 0.133             & 6.819         & 0.025         \\
+Swap Check        & 0.013             & 3.427         & 0.001         \\
+Double Exp Filter & 0.02              & 4.698         & 0.001        
+\end{tabular}
+\caption{Data fusion implementation performance.}
+\label{tab:fuser}
+\end{table}
+
+\section{Combined Performance}
+
+
